@@ -51,9 +51,12 @@ cargo install --path .            # puts `cz` in ~/.cargo/bin
 
 ### Shell setup (required)
 
-`cz` changes your shell's directory, so it needs a small shell function. Make
-sure the install directory is on your `PATH`, then add one line to your rc
-file and open a new terminal:
+`cz` changes your shell's directory, so it needs a small shell function.
+Without it, `cz` still runs and the picker still works, but **your directory
+won't change**.
+
+**1. Add the setup line to your rc file.** Make sure the install directory is
+on your `PATH` *before* this line.
 
 ```sh
 # zsh
@@ -61,6 +64,35 @@ echo 'eval "$(cz --init zsh)"' >> ~/.zshrc
 # bash
 echo 'eval "$(cz --init bash)"' >> ~/.bashrc
 ```
+
+**2. Reload your shell.** This step is easy to miss. Terminals that are
+already open don't see the change until you do one of these:
+
+```sh
+source ~/.zshrc      # zsh
+source ~/.bashrc     # bash
+# ...or close the terminal and open a new one
+```
+
+**3. Check that it worked:**
+
+```sh
+type cz
+# expected: "cz is a shell function"
+```
+
+If it says `cz is /…/cz`, the function isn't loaded. Check these:
+
+* Did you reload (step 2)?
+* Is the line in the right file for your shell? `echo $SHELL` tells you which
+  shell you use.
+* Is the install directory on `PATH` *above* the `eval` line?
+  `~/.local/bin` for the installer, `~/.cargo/bin` for cargo:
+
+  ```sh
+  export PATH="$HOME/.local/bin:$PATH"
+  eval "$(cz --init zsh)"
+  ```
 
 The function is called `cz` and shadows the binary. It calls the binary by the
 absolute path baked in at `--init` time. If you move the binary, open a new

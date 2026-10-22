@@ -71,8 +71,16 @@ case ":$PATH:" in
 esac
 
 cat <<'EOF'
-Finish setup by adding ONE line to your shell rc file, then open a new terminal:
+Finish setup (cz can't change directories without this):
 
-  zsh:   echo 'eval "$(cz --init zsh)"' >> ~/.zshrc
-  bash:  echo 'eval "$(cz --init bash)"' >> ~/.bashrc
+  1. Add the shell function to your rc file:
+       zsh:   echo 'eval "$(cz --init zsh)"' >> ~/.zshrc
+       bash:  echo 'eval "$(cz --init bash)"' >> ~/.bashrc
+
+  2. Reload your shell. Already-open terminals won't see it otherwise:
+       zsh:   source ~/.zshrc
+       bash:  source ~/.bashrc
+     (or open a new terminal)
+
+  3. Check:  type cz   ->  should say "cz is a shell function"
 EOF
