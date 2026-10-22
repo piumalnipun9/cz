@@ -12,22 +12,68 @@ cz is self-contained. It does not depend on zoxide, fzf, or fd at runtime.
 
 ## Install
 
+**Requirements:** Linux on x86-64. The release binary is fully static, so it
+runs on any distribution with no dependencies. zsh or bash is needed for the
+shell integration.
+
+### Quick install
+
 ```sh
+curl -fsSL https://raw.githubusercontent.com/piumalnipun9/cz/main/install.sh | sh
+```
+
+This downloads the latest release, verifies its SHA-256 checksum and installs
+`cz` to `~/.local/bin`. Options:
+
+* `CZ_VERSION=v0.1.0` installs a specific version.
+* `CZ_INSTALL_DIR=/some/dir` installs somewhere else.
+
+For example:
+`curl -fsSL https://raw.githubusercontent.com/piumalnipun9/cz/main/install.sh | CZ_INSTALL_DIR=~/bin sh`
+
+### Manual download
+
+```sh
+VERSION=v0.1.0
+curl -fLO https://github.com/piumalnipun9/cz/releases/download/$VERSION/cz-$VERSION-x86_64-unknown-linux-musl.tar.gz
+curl -fLO https://github.com/piumalnipun9/cz/releases/download/$VERSION/cz-$VERSION-x86_64-unknown-linux-musl.tar.gz.sha256
+sha256sum -c cz-$VERSION-x86_64-unknown-linux-musl.tar.gz.sha256
+tar -xzf cz-$VERSION-x86_64-unknown-linux-musl.tar.gz
+install -m 755 cz-$VERSION-x86_64-unknown-linux-musl/cz ~/.local/bin/cz
+```
+
+### From source
+
+```sh
+git clone https://github.com/piumalnipun9/cz && cd cz
 cargo install --path .            # puts `cz` in ~/.cargo/bin
 ```
 
-Then add one line to your shell rc file:
+### Shell setup (required)
+
+`cz` changes your shell's directory, so it needs a small shell function. Make
+sure the install directory is on your `PATH`, then add one line to your rc
+file and open a new terminal:
 
 ```sh
-# ~/.zshrc
-eval "$(cz --init zsh)"
-# ~/.bashrc
-eval "$(cz --init bash)"
+# zsh
+echo 'eval "$(cz --init zsh)"' >> ~/.zshrc
+# bash
+echo 'eval "$(cz --init bash)"' >> ~/.bashrc
 ```
 
-The shell function is called `cz` and shadows the binary. It calls the binary
-by the absolute path that was baked in at `--init` time. If you move the
-binary, re-run `--init`.
+The function is called `cz` and shadows the binary. It calls the binary by the
+absolute path baked in at `--init` time. If you move the binary, open a new
+terminal (or re-run the `eval` line) to pick up the new location.
+
+### Uninstall
+
+Remove the `eval` line from your rc file, then:
+
+```sh
+rm ~/.local/bin/cz                        # or ~/.cargo/bin/cz
+rm -rf ~/.local/share/cz ~/.config/cz     # history and config
+```
 
 ## Usage
 
@@ -281,3 +327,7 @@ Known limits:
   candidate. It is fast in practice, but it is the first thing to move to a
   worker thread if needed.
 * History never ages out.
+
+## License
+
+MIT © 2026 Piumal Nipun. See [LICENSE](LICENSE).

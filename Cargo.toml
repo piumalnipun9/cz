@@ -2,6 +2,14 @@
 name = "cz"
 version = "0.1.0"
 edition = "2024"
+authors = ["Piumal Nipun <piumalnipun9@gmail.com>"]
+description = "Jump to directories by partial name: learned frecency history plus scoped fuzzy filesystem search, with an interactive picker"
+license = "MIT"
+repository = "https://github.com/piumalnipun9/cz"
+homepage = "https://github.com/piumalnipun9/cz"
+readme = "README.md"
+keywords = ["cd", "navigation", "fuzzy", "terminal", "cli"]
+categories = ["command-line-utilities", "filesystem"]
 
 [dependencies]
 anyhow = "1.0.104"
