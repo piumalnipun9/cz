@@ -101,12 +101,15 @@ fn draw_search(f: &mut Frame, app: &App, area: Rect) {
 fn draw_scope(f: &mut Frame, app: &App, area: Rect) {
     let status = if app.scanning {
         format!(
-            "{} scanning {} dirs",
+            "{} scanning {} entries",
             SPINNER[app.tick % SPINNER.len()],
             app.scanned
         )
     } else {
-        let mut s = format!("{} dirs", app.scanned);
+        let mut s = match &app.summary {
+            Some(sum) if sum.files > 0 => format!("{} dirs, {} files", sum.dirs, sum.files),
+            _ => format!("{} dirs", app.scanned),
+        };
         if let Some(sum) = &app.summary {
             if sum.errors > 0 {
                 s.push_str(&format!(", {} unreadable", sum.errors));
@@ -187,7 +190,11 @@ fn draw_results(f: &mut Frame, app: &mut App, area: Rect) {
             } else {
                 Span::raw("  ")
             },
-            badge(c.source()),
+            if c.history.is_none() && !c.path.is_dir() {
+                Span::styled("file ", Style::default().fg(Color::Yellow))
+            } else {
+                badge(c.source())
+            },
         ];
         let suffix = if app.show_scores {
             let visits = c

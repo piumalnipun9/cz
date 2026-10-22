@@ -60,9 +60,9 @@ pub struct Cli {
     #[arg(long, value_name = "DIR")]
     pub record: Option<OsString>,
 
-    /// Always open the interactive picker (no direct jumps)
-    #[arg(short = 'i', long)]
-    pub interactive: bool,
+    /// Always open the picker and include files (used by the `czi` function)
+    #[arg(long, hide = true)]
+    pub pick: bool,
 
     /// Print ranked matches instead of opening the interactive UI
     #[arg(long)]

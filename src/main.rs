@@ -110,8 +110,8 @@ fn run() -> Result<ExitCode> {
     let query = cli.query_string();
 
     // cd semantics first: a single argument naming an existing directory is
-    // a destination, not a query (unless -i or a scope flag asks to search).
-    if !cli.interactive && !cli.list && !cli.has_scope_flags() && cli.query.len() == 1 {
+    // a destination, not a query (unless czi or a scope flag asks to search).
+    if !cli.pick && !cli.list && !cli.has_scope_flags() && cli.query.len() == 1 {
         let target = paths::normalize(&paths::expand(cli.query[0].as_ref()), &cwd);
         if target.is_dir() {
             emit_selection(&target, cli.output_file.as_deref())?;
@@ -129,7 +129,8 @@ fn run() -> Result<ExitCode> {
         now,
         cfg.search.max_results,
     );
-    let opts = ScanOptions::from(&cfg.search);
+    let mut opts = ScanOptions::from(&cfg.search);
+    opts.include_files = cli.pick;
 
     if cli.list || cli.first {
         let mut found = Vec::new();
@@ -176,7 +177,7 @@ fn run() -> Result<ExitCode> {
     // jump without the picker. Otherwise the picker opens with what we have.
     let mut scanned = 0;
     let mut summary = None;
-    if !cli.interactive && cfg.jump.auto && !query.trim().is_empty() {
+    if !cli.pick && cfg.jump.auto && !query.trim().is_empty() {
         engine.set_query(&query);
         let bound = search::unseen_bound(&cfg.ranking);
         // History alone may already decide it: no need to wait for the scan.
@@ -219,6 +220,11 @@ fn run() -> Result<ExitCode> {
     app.show_preview = cfg.ui.show_preview;
     match tui::run(app, Some(scan))? {
         Outcome::Selected(p) => {
+            // A picked file means "go to where it lives".
+            let p = match p.parent() {
+                Some(parent) if !p.is_dir() => parent.to_path_buf(),
+                _ => p,
+            };
             emit_selection(&p, cli.output_file.as_deref())?;
             Ok(ExitCode::SUCCESS)
         }

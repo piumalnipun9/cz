@@ -11,6 +11,9 @@
 //!   are themselves a root. Skipping them before `read_dir` also avoids
 //!   triggering automounts or hanging on unreachable network shares.
 //!
+//! With `include_files` (used by `czi`) regular files are emitted too; only
+//! directories are descended into.
+//!
 //! The scan is independent of the query: it collects directories once and the
 //! UI re-matches them as the query changes, so typing never restarts I/O.
 //! Breadth-first order means shallow (usually more relevant) directories
@@ -35,6 +38,7 @@ pub struct ScanOptions {
     pub max_depth: usize,
     pub follow_symlinks: bool,
     pub max_entries: usize,
+    pub include_files: bool,
     pub excluded_names: HashSet<OsString>,
     pub excluded_paths: HashSet<PathBuf>,
 }
@@ -50,6 +54,7 @@ impl From<&SearchConfig> for ScanOptions {
             max_depth: c.max_depth,
             follow_symlinks: c.follow_symlinks,
             max_entries: c.max_scan_entries,
+            include_files: false,
             excluded_names: c
                 .exclusions
                 .directories
@@ -103,6 +108,7 @@ fn unescape_mount(s: &str) -> String {
 #[derive(Debug, Clone, Default, PartialEq, Eq)]
 pub struct ScanSummary {
     pub dirs: usize,
+    pub files: usize,
     pub errors: usize,
     pub truncated: bool,
     pub cancelled: bool,
@@ -168,6 +174,14 @@ pub fn scan(
                 false
             };
             if !is_dir {
+                if opts.include_files && (ft.is_file() || ft.is_symlink()) {
+                    emit(dir.join(&name));
+                    sum.files += 1;
+                    if sum.dirs + sum.files >= opts.max_entries {
+                        sum.truncated = true;
+                        break 'outer;
+                    }
+                }
                 continue;
             }
             let path = dir.join(&name);
@@ -182,7 +196,7 @@ pub fn scan(
             }
             emit(path.clone());
             sum.dirs += 1;
-            if sum.dirs >= opts.max_entries {
+            if sum.dirs + sum.files >= opts.max_entries {
                 sum.truncated = true;
                 break 'outer;
             }
@@ -354,6 +368,23 @@ mod tests {
         let (found, s) = collect(std::slice::from_ref(&r), &o);
         assert_eq!(found.len(), 1);
         assert!(s.truncated);
+    }
+
+    #[test]
+    fn files_only_when_asked() {
+        let t = tempfile::tempdir().unwrap();
+        let r = t.path().to_path_buf();
+        fs::create_dir_all(r.join("a")).unwrap();
+        fs::write(r.join("a/notes.txt"), "").unwrap();
+        let (found, _) = collect(std::slice::from_ref(&r), &opts());
+        assert_eq!(found, vec![r.join("a")]);
+        let o = ScanOptions {
+            include_files: true,
+            ..opts()
+        };
+        let (found, s) = collect(std::slice::from_ref(&r), &o);
+        assert_eq!(found, vec![r.join("a"), r.join("a/notes.txt")]);
+        assert_eq!((s.dirs, s.files), (1, 1));
     }
 
     #[test]

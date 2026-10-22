@@ -25,7 +25,7 @@ curl -fsSL https://raw.githubusercontent.com/piumalnipun9/cz/main/install.sh | s
 This downloads the latest release, verifies its SHA-256 checksum and installs
 `cz` to `~/.local/bin`. Options:
 
-* `CZ_VERSION=v0.1.0` installs a specific version.
+* `CZ_VERSION=v0.2.0` installs a specific version.
 * `CZ_INSTALL_DIR=/some/dir` installs somewhere else.
 
 For example:
@@ -34,7 +34,7 @@ For example:
 ### Manual download
 
 ```sh
-VERSION=v0.1.0
+VERSION=v0.2.0
 curl -fLO https://github.com/piumalnipun9/cz/releases/download/$VERSION/cz-$VERSION-x86_64-unknown-linux-musl.tar.gz
 curl -fLO https://github.com/piumalnipun9/cz/releases/download/$VERSION/cz-$VERSION-x86_64-unknown-linux-musl.tar.gz.sha256
 sha256sum -c cz-$VERSION-x86_64-unknown-linux-musl.tar.gz.sha256
@@ -117,7 +117,7 @@ rm -rf ~/.local/share/cz ~/.config/cz     # history and config
 | `cz -`                       | go back to the previous directory, like `cd -`           |
 | `cz ~`, `cz ..`, `cz /etc`, `cz src` | if the argument is an existing directory, go there directly |
 | `cz kicad`                   | search; jump directly if one match is clearly best, otherwise open the picker |
-| `cz -i kicad`                | always open the picker                                   |
+| `czi` / `czi kicad`          | always open the picker, listing directories **and files**; picking a file takes you to its folder |
 
 **When a search jumps directly.** cz waits up to `jump.wait_ms` (400 ms) for
 the scan to finish. It then jumps if the best match has quality ≥ 0.6 and one
@@ -132,6 +132,13 @@ score, so a directory you picked once or twice recently pulls ahead of others
 with the same name and starts jumping directly. As recency decays, close
 matches go back to the picker. A slow scan (for example `-r`) always ends in
 the picker, which keeps updating as the scan continues.
+
+**`czi`: the interactive picker.** Like zoxide's `zi`, `czi` never jumps on
+its own. It lists history plus every directory *and file* in scope, so you can
+find a folder by a file inside it: `czi main.rs` → pick → you're in `src/`.
+Files are tagged `file` in the list; history only ever records directories.
+Scope flags work as with `cz` (`czi -H notes`). `czi` replaces the old
+`cz -i`, which was removed in v0.2.0.
 
 Scope flags:
 
@@ -302,12 +309,12 @@ results, and `--prune` deletes them.
 
 ### Shell integration (no `eval` of output)
 
-A child process cannot change its parent shell's directory, so `cz` is a shell
-function:
+A child process cannot change its parent shell's directory, so `cz` and `czi`
+are shell functions:
 
 1. It creates a private temp file with `mktemp` and runs the binary with
    `--output-file <tmp>`. The TUI draws on stderr.
-2. When you select a directory, the binary writes the raw path bytes to that
+2. When you select a directory (or a file, in `czi`: its parent directory), the binary writes the raw path bytes to that
    file and exits 0. When you cancel, it writes nothing and exits non-zero.
 3. The function reads the file as data. A sentinel character keeps trailing
    newlines intact. It then runs `builtin cd -- "$dir"`. The path is never

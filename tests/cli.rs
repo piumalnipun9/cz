@@ -322,9 +322,9 @@ fn clear_match_jumps_without_picker_and_ambiguous_does_not() {
         pwd_after("bash", &e, &e.home, "cz dup"),
         e.home.to_string_lossy()
     );
-    // -i always wants the picker, even for an existing path.
+    // czi always wants the picker, even for an existing path.
     assert_eq!(
-        pwd_after("bash", &e, &e.home, "cz -i p"),
+        pwd_after("bash", &e, &e.home, "czi p"),
         e.home.to_string_lossy()
     );
 }
