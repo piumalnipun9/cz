@@ -14,6 +14,8 @@
 
 cz is self-contained. It does not depend on zoxide, fzf, or fd at runtime.
 
+![cz demo: jumping by name, learning from picks, and browsing folders and files with czi](assets/demo.gif)
+
 ## Install
 
 **Requirements:** Linux on x86-64. The release binary is fully static, so it
