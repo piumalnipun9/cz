@@ -36,6 +36,10 @@ pub struct Cli {
     #[arg(short = 'p', long = "path", value_name = "PATH", num_args = 1, action = clap::ArgAction::Append)]
     pub paths: Vec<OsString>,
 
+    /// Also search network and FUSE mounts (sshfs, NFS, ...), skipped by default
+    #[arg(short = 'm', long)]
+    pub mounts: bool,
+
     /// Print visit history, most relevant first
     #[arg(long)]
     pub history: bool,

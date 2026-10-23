@@ -3,13 +3,11 @@
 //! | Key                     | Action                                      |
 //! |-------------------------|---------------------------------------------|
 //! | text                    | edit the query (results update live)        |
-//! | Up / Ctrl-P / Ctrl-K    | previous result                             |
-//! | Down / Ctrl-N / Ctrl-J  | next result                                 |
+//! | Up / Shift-Tab / Ctrl-P / Ctrl-K | previous result                    |
+//! | Down / Tab / Ctrl-N / Ctrl-J     | next result                        |
 //! | PageUp / PageDown       | move by a page                              |
 //! | Enter                   | jump to the highlighted directory           |
-//! | Tab                     | same as Enter: select and jump              |
-//! | Esc                     | cancel; the shell stays where it was        |
-//! | Ctrl-C                  | quit (like Esc, exit status 130)            |
+//! | Esc / Ctrl-C            | cancel; the shell stays where it was        |
 //! | Ctrl-U / Ctrl-W         | clear query / delete previous word          |
 //! | Left/Right, Home/End, Ctrl-A/Ctrl-E | move the cursor                 |
 
@@ -32,7 +30,6 @@ pub enum Action {
     PageDown,
     Accept,
     Cancel,
-    Quit,
     None,
 }
 
@@ -42,7 +39,7 @@ pub fn map(key: KeyEvent) -> Action {
     }
     let ctrl = key.modifiers.contains(KeyModifiers::CONTROL);
     match key.code {
-        KeyCode::Char('c') if ctrl => Action::Quit,
+        KeyCode::Char('c') if ctrl => Action::Cancel,
         KeyCode::Char('p' | 'k') if ctrl => Action::Up,
         KeyCode::Char('n' | 'j') if ctrl => Action::Down,
         KeyCode::Char('u') if ctrl => Action::ClearLine,
@@ -59,10 +56,10 @@ pub fn map(key: KeyEvent) -> Action {
         KeyCode::Home => Action::Home,
         KeyCode::End => Action::End,
         KeyCode::Up | KeyCode::BackTab => Action::Up,
-        KeyCode::Down => Action::Down,
+        KeyCode::Down | KeyCode::Tab => Action::Down,
         KeyCode::PageUp => Action::PageUp,
         KeyCode::PageDown => Action::PageDown,
-        KeyCode::Enter | KeyCode::Tab => Action::Accept,
+        KeyCode::Enter => Action::Accept,
         KeyCode::Esc => Action::Cancel,
         _ => Action::None,
     }
@@ -78,12 +75,13 @@ mod tests {
 
     #[test]
     fn bindings() {
-        assert_eq!(k(KeyCode::Char('c'), KeyModifiers::CONTROL), Action::Quit);
+        assert_eq!(k(KeyCode::Char('c'), KeyModifiers::CONTROL), Action::Cancel);
         assert_eq!(
             k(KeyCode::Char('C'), KeyModifiers::SHIFT),
             Action::Insert('C')
         );
-        assert_eq!(k(KeyCode::Tab, KeyModifiers::NONE), Action::Accept);
+        assert_eq!(k(KeyCode::Tab, KeyModifiers::NONE), Action::Down);
+        assert_eq!(k(KeyCode::BackTab, KeyModifiers::SHIFT), Action::Up);
         assert_eq!(k(KeyCode::Esc, KeyModifiers::NONE), Action::Cancel);
     }
 }

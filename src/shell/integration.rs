@@ -12,6 +12,7 @@
 //!    trailing newlines in a directory name survive command substitution),
 //!    then runs `builtin cd -- "$dir"`. Nothing is ever `eval`ed, so names like
 //!    `$(rm -rf ~)` or `a; b` are just directory names.
+//!    A cancelled picker (status 130) returns 0, so prompts don't flag an error.
 //! 4. Only if `cd` succeeds does it call `--record "$PWD"`, so cancelled or
 //!    failed navigation is never learned.
 //!
@@ -50,6 +51,8 @@ __cz_go() {
         return 0
     fi
     command rm -f -- "$__cz_tmp"
+    # 130 is a cancelled picker (Esc/Ctrl-C): not an error, so keep the prompt calm.
+    [ "$__cz_status" -eq 130 ] && return 0
     return "$__cz_status"
 }
 

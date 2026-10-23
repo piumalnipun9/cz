@@ -1,5 +1,9 @@
 # cz — intelligent directory navigator
 
+> **Status: alpha.** cz works day to day, but options and behavior may still
+> change between releases (for example, `cz -i` was replaced by `czi` in
+> v0.2.0). Please report problems on the issue tracker.
+
 `cz <query>` merges two sources into one interactive, fuzzy-ranked list and
 `cd`s your shell to the pick:
 
@@ -25,7 +29,7 @@ curl -fsSL https://raw.githubusercontent.com/piumalnipun9/cz/main/install.sh | s
 This downloads the latest release, verifies its SHA-256 checksum and installs
 `cz` to `~/.local/bin`. Options:
 
-* `CZ_VERSION=v0.2.0` installs a specific version.
+* `CZ_VERSION=v0.2.1` installs a specific version.
 * `CZ_INSTALL_DIR=/some/dir` installs somewhere else.
 
 For example:
@@ -34,7 +38,7 @@ For example:
 ### Manual download
 
 ```sh
-VERSION=v0.2.0
+VERSION=v0.2.1
 curl -fLO https://github.com/piumalnipun9/cz/releases/download/$VERSION/cz-$VERSION-x86_64-unknown-linux-musl.tar.gz
 curl -fLO https://github.com/piumalnipun9/cz/releases/download/$VERSION/cz-$VERSION-x86_64-unknown-linux-musl.tar.gz.sha256
 sha256sum -c cz-$VERSION-x86_64-unknown-linux-musl.tar.gz.sha256
@@ -149,6 +153,7 @@ Scope flags:
 | `cz -r <query>` / `--root`        | `/` (virtual/network mounts skipped) |
 | `cz -p DIR <query>` / `--path`    | DIR                                  |
 | `cz -p A -p B <query>`            | A and B                              |
+| `cz -m ...` / `--mounts`          | also enter network/FUSE mounts (sshfs, NFS, ...) |
 
 * Flags may appear before or after the query. Multiple words are matched
   independently, so `cz cnn front` works. Use `--` for a query that starts
@@ -161,6 +166,10 @@ Scope flags:
   usual). `$VAR` is expanded only if the literal path does not exist and the
   variable is set, because the shell normally expands variables already.
   Invalid roots are an error (exit status 2) naming the path.
+* **Network mounts are skipped by default** (sshfs, NFS, CIFS, FUSE, autofs),
+  even under `-r`, because walking them over the network can take minutes.
+  Add `-m` to include them: `czi -m -p /remote Malshan`. A mount given
+  directly as a root (`-p /remote/elgin`) is always searched.
 * `-h` is help; `-H` is home.
 
 Other commands:
@@ -179,12 +188,10 @@ cz --first <query>    # take the best match without the UI
 | Key                              | Action                                  |
 |----------------------------------|-----------------------------------------|
 | typing                           | live fuzzy filter                       |
-| ↑/↓, Ctrl-P/N, Ctrl-K/J          | move selection                          |
+| ↑/↓, Tab/Shift-Tab, Ctrl-P/N, Ctrl-K/J | move selection                    |
 | PgUp/PgDn                        | move by a page                          |
 | **Enter**                        | jump to the highlighted directory       |
-| **Tab**                          | same as Enter: select and jump          |
-| **Esc**                          | cancel; directory unchanged (status 1)  |
-| **Ctrl-C**                       | quit; directory unchanged (status 130)  |
+| **Esc** / **Ctrl-C**             | cancel; directory unchanged, no error status |
 | Ctrl-U / Ctrl-W                  | clear query / delete previous word      |
 | ←/→, Home/End, Ctrl-A/E          | move the cursor                         |
 

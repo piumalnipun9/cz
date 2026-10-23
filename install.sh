@@ -5,7 +5,7 @@
 #   curl -fsSL https://raw.githubusercontent.com/piumalnipun9/cz/main/install.sh | sh
 #
 # Environment:
-#   CZ_VERSION      release tag to install (default: latest), e.g. v0.2.0
+#   CZ_VERSION      release tag to install (default: latest), e.g. v0.2.1
 #   CZ_INSTALL_DIR  where to put the binary (default: ~/.local/bin)
 
 set -eu

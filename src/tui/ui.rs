@@ -59,13 +59,7 @@ pub fn draw(f: &mut Frame, app: &mut App) {
         draw_results(f, app, body);
     }
 
-    let keys = [
-        ("↑↓", "Navigate"),
-        ("Enter", "Jump"),
-        ("Tab", "Select"),
-        ("Esc", "Cancel"),
-        ("^C", "Quit"),
-    ];
+    let keys = [("↑↓/Tab", "Navigate"), ("Enter", "Jump"), ("Esc", "Cancel")];
     let mut spans = Vec::new();
     for (k, v) in keys {
         spans.push(Span::styled(

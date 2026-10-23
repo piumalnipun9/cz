@@ -1,6 +1,6 @@
 [package]
 name = "cz"
-version = "0.2.0"
+version = "0.2.1"
 edition = "2024"
 authors = ["Piumal Nipun <piumalnipun9@gmail.com>"]
 description = "Jump to directories by partial name: learned frecency history plus scoped fuzzy filesystem search, with an interactive picker"

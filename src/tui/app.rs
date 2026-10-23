@@ -10,7 +10,6 @@ use crate::search::filesystem::ScanSummary;
 pub enum Outcome {
     Selected(PathBuf),
     Cancelled,
-    Interrupted,
 }
 
 pub struct App {
@@ -140,7 +139,6 @@ impl App {
             Action::PageDown => self.selected += self.page.max(1),
             Action::Accept => return self.current_path().map(Outcome::Selected),
             Action::Cancel => return Some(Outcome::Cancelled),
-            Action::Quit => return Some(Outcome::Interrupted),
             _ => {}
         }
         if self.input != before {
@@ -186,7 +184,6 @@ mod tests {
         a.handle(Action::Up);
         assert_eq!(a.selected, 0);
         assert_eq!(a.handle(Action::Cancel), Some(Outcome::Cancelled));
-        assert_eq!(a.handle(Action::Quit), Some(Outcome::Interrupted));
     }
 
     #[test]

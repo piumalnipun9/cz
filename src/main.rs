@@ -131,6 +131,10 @@ fn run() -> Result<ExitCode> {
     );
     let mut opts = ScanOptions::from(&cfg.search);
     opts.include_files = cli.pick;
+    if cli.mounts {
+        // Keep the fixed path exclusions (/proc, ...) but not the mount-type ones.
+        opts.excluded_paths = cfg.search.exclusions.paths.iter().cloned().collect();
+    }
 
     if cli.list || cli.first {
         let mut found = Vec::new();
@@ -228,7 +232,7 @@ fn run() -> Result<ExitCode> {
             emit_selection(&p, cli.output_file.as_deref())?;
             Ok(ExitCode::SUCCESS)
         }
-        Outcome::Cancelled => Ok(ExitCode::FAILURE),
-        Outcome::Interrupted => Ok(ExitCode::from(130)),
+        // 130 (like fzf) marks a cancel, which the shell function treats as success.
+        Outcome::Cancelled => Ok(ExitCode::from(130)),
     }
 }

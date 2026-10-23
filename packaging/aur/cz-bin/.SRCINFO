@@ -1,0 +1,15 @@
+pkgbase = cz-bin
+	pkgdesc = Jump to directories by partial name: a cd/z replacement with frecency history and a fuzzy picker
+	pkgver = 0.2.1
+	pkgrel = 1
+	url = https://github.com/piumalnipun9/cz
+	install = cz.install
+	arch = x86_64
+	license = MIT
+	provides = cz
+	conflicts = cz
+	options = !debug
+	source = https://github.com/piumalnipun9/cz/releases/download/v0.2.1/cz-v0.2.1-x86_64-unknown-linux-musl.tar.gz
+	sha256sums = a7ec093611abb38cd722ac37466f1e3313611621fe55c560f26881605788a4ac
+
+pkgname = cz-bin

@@ -1,0 +1,19 @@
+_cz_msg() {
+  cat <<'MSG'
+==> cz needs a shell function to change directories. Add ONE of these
+    to your rc file, then reload your shell (or open a new terminal):
+
+      zsh:   echo 'eval "$(cz --init zsh)"' >> ~/.zshrc && source ~/.zshrc
+      bash:  echo 'eval "$(cz --init bash)"' >> ~/.bashrc && source ~/.bashrc
+
+    Check with:  type cz   (should say "cz is a shell function")
+MSG
+}
+
+post_install() {
+  _cz_msg
+}
+
+post_upgrade() {
+  echo "==> Reload your shell (source ~/.zshrc or ~/.bashrc) to pick up changes such as czi."
+}
