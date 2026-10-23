@@ -1,8 +1,8 @@
 # cz — intelligent directory navigator
 
-> **Status: alpha.** cz works day to day, but options and behavior may still
-> change between releases (for example, `cz -i` was replaced by `czi` in
-> v0.2.0). Please report problems on the issue tracker.
+> **Status: beta (v0.2.1).** cz is ready for public testing. Behavior is mostly
+> settled, but options may still change before 1.0 (for example, `cz -i` was
+> replaced by `czi` in v0.2.0). Please report problems on the issue tracker.
 
 `cz <query>` merges two sources into one interactive, fuzzy-ranked list and
 `cd`s your shell to the pick:
